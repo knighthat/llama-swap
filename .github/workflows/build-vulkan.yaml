@@ -32,8 +32,8 @@ jobs:
           set -euo pipefail
 
           # Latest llama.cpp nightly (bNNNN) release
-          LLAMACPP_TAG=$(gh api "repos/${LLAMACPP_REPO}/releases/latest" \
-            --jq '.tag_name // empty')
+          LLAMACPP_TAG=$(gh api "repos/${LLAMACPP_REPO}/releases?per_page=100" \
+            --jq '[.[] | select(.prerelease == true and .draft == false)][0].tag_name // empty')
 
           # Latest llama-swap stable (non-prerelease) release
           LLAMASWAP_TAG=$(gh api "repos/${LLAMASWAP_REPO}/releases/latest" \
