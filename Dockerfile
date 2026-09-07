@@ -68,5 +68,5 @@ USER app:0
 
 EXPOSE 8080
 
-HEALTHCHECK CMD curl -f http://localhost:8080/ || exit 1
+HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8080/health || exit 1
 ENTRYPOINT ["llama-swap", "--config", "/app/config.yaml", "--watch-config"]
