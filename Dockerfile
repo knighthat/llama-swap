@@ -17,8 +17,21 @@ RUN apk add --no-cache \
 WORKDIR /app/llama.cpp
 COPY llama.cpp .
 
-RUN cmake -B build -DGGML_VULKAN=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
-RUN cmake --build build --config Release -j$(nproc)
+# Attempt to build then run 'llama-server --version' to check if segfault/core dump happens
+# If it does, rebuild until run out of retries (3)
+# If it doesn't, continue
+RUN set -eu; \
+    for attempt in 1 2 3; do \
+      rm -rf build; \
+      jobs=$([ "$attempt" -eq 1 ] && nproc || echo 1); \
+      if cmake -B build -DGGML_VULKAN=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+         && cmake --build build --config Release -j"$jobs" --target llama-server \
+         && ./build/bin/llama-server --version; then \
+        echo "build OK on attempt $attempt"; exit 0; \
+      fi; \
+      echo "attempt $attempt failed, rebuilding"; \
+    done; \
+    echo "llama.cpp build failed after 3 attempts"; exit 1
 
 # ==========================================
 # Stage 2: Build llama-swap
