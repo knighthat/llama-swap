@@ -24,7 +24,7 @@ RUN set -eu; \
     for attempt in 1 2 3; do \
       rm -rf build; \
       jobs=$([ "$attempt" -eq 1 ] && nproc || echo 1); \
-      if cmake -B build -DGGML_VULKAN=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+      if cmake -B build -DGGML_VULKAN=ON -DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON -DGGML_BMI2=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
          && cmake --build build --config Release -j"$jobs" --target llama-server \
          && ./build/bin/llama-server --version; then \
         echo "build OK on attempt $attempt"; exit 0; \
