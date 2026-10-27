@@ -38,7 +38,7 @@ RUN set -eu; \
 # ==========================================
 FROM golang:alpine AS swapbuilder
 
-RUN apk add --no-cache nodejs npm make
+RUN apk add --no-cache nodejs npm make tar git bash curl build-base
 
 # Allow Go to automatically download the newer toolchain version specified in go.mod
 ENV GOTOOLCHAIN=auto
